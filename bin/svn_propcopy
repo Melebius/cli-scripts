@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Copy SVN property from one file to another.
+#
+# Usage: svn_propcopy <property> <source> [<target> ...]
+
+PROPERTY=$1
+SOURCE=$2
+shift 2
+
+svn propset $PROPERTY "$(svn propget $PROPERTY $SOURCE)" "$@"

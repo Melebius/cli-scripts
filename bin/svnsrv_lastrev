@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# Find the latest revision (highest revision number) of a SVN repository.
+# To be run on a SVN server. On a client, use: svn info <repository-root>
+
+if [ -z "$1" ]; then
+  echo "Usage: $0 <repository-root>"
+  exit 1
+fi
+
+revs_dir="$1/db/revs"
+
+hi_num_dir() {
+  [ -d "$1" ] && ls "$1" | sort -n | tail -1
+}
+
+hi_num_dir "$revs_dir/$(hi_num_dir "$revs_dir")"

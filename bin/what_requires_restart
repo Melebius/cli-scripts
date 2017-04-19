@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Print packages which require restart of the Ubuntu machine.
+
+cat /var/run/reboot-required.pkgs

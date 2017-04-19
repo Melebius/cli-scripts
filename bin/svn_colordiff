@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Shortcut to show output of 'svn diff' in colors.
+
+svn diff "$@" | colordiff

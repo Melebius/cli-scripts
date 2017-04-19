@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# A (hopefully) safe networking restart over SSH.
+# Checks the environment and restarts networking.
+# Restores previous settings if not cancelled within the time limit.
+
+# --- configuration ----
+CONFFILE=${1:-/etc/network/interfaces}
+CONFFILE_BACKUP=$CONFFILE.bak
+INTERFACE=eth0
+TIME_LIMIT=60
+
+# --- functions ----
+print_err()
+{
+	echo >&2 ERROR: "$*"
+}
+
+do_network_restart()
+{
+	# change this if another command (sequence) is more appropriate in your environment
+	ifdown $INTERFACE
+	ifup $INTERFACE
+}
+
+# ====== MAIN PROGRAM BEGIN ======
+# --- initial checks ----
+if [ "$TERM" != "screen" ]; then
+	print_err "Must be run in a 'screen' session to keep running when SSH disconnects."
+	exit 1
+fi
+
+if ! >> $CONFFILE; then
+	print_err "$CONFFILE is not writable!"
+	exit 1
+fi
+
+if ! [ -r $CONFFILE_BACKUP ]; then
+	print_err "$CONFFILE_BACKUP cannot be read!"
+	exit 1
+fi
+
+# --- networking restart ---
+do_network_restart
+
+# --- wait for cancellation ---
+echo ""
+echo "Press Ctrl-C to accept the new configuration."
+echo "(Waiting $TIME_LIMIT seconds before restoring the previous configuration...)"
+sleep $TIME_LIMIT
+
+# --- restore previous settings ----
+cp $CONFFILE_BACKUP $CONFFILE
+do_network_restart
+echo "Network configuration restored."
