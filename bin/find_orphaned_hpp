@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# Prints *.hpp files without matching *.cpp in the given directory (default = .)
+
+find "${1:-.}" -name '*.hpp' -exec bash -c 'test -f ${0/hpp/cpp} || echo $0' "{}" \;
