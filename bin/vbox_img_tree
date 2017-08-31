@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+#
+# List the tree of VirtualBox virtual media with the size of each medium.
+# Provide the filename (or UUID) of the tree root as the command-line parameter.
+#
+# Intended primarily for examination of snapshots.
+# The output formatting is inspired by 'VBoxManage snapshot <VM> list'.
+
+import re, subprocess, sys
+
+def indent(level):
+        result = ""
+        for i in range(level):
+                result += "  "
+        return result
+
+to_print = re.compile("UUID|Size on disk|In use by VM")
+first_child = re.compile("Child UUIDs:")
+
+queue = [(0, sys.argv[1])]
+
+while queue:
+        level, uuid = queue.pop(0)
+        diskinfo = subprocess.check_output(["VBoxManage","showmediuminfo","disk", uuid])
+        children = False
+        tmpqueue = []
+        for rawline in diskinfo.splitlines():
+                line = str(rawline, 'utf-8')
+                if to_print.match(line):
+                        print(indent(level) + line)
+                if not children and first_child.match(line):
+                        children = True # from now on (until EOF), children's UUIDs are listed
+                if children:
+                        child = line[-36:] # UUID is 36 chars long
+                        tmpqueue.append((level + 1, child))
+        queue = tmpqueue + queue # match the order of VBoxManage snapshot list
