@@ -23,3 +23,5 @@ to the original command, unlike `git-gui` or `apt-get`, for example.
 
 The scripts located in the `sbin` folder require administrative privileges
 while these in the `bin` folder do not.
+The folder `zsh-custom` can be set as
+[`$ZSH_CUSTOM`](https://github.com/robbyrussell/oh-my-zsh/wiki/Customization#using-another-customization-directory).
